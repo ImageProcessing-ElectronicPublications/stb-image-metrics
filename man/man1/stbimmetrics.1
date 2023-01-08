@@ -1,0 +1,63 @@
+.TH "StbImMetrics" 1 0.2.4 "8 Jan 2023" "User Manual"
+
+.SH NAME
+stbimmetrics
+
+.SH DESCRIPTION
+This utility compares two graphics files based on metrics.
+
+Includes metrics:
+- MSE / MAX^2, MAX = 255
+- PSNR
+- NHW neatness
+- NHW convolutional
+- NHW relative
+
+The value of MSE metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
+
+The value of PSNR metrics is from 1.0 (maximum difference) to inf.
+
+The value of NHW metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
+
+.SH SYNOPSIS
+stbimmetrics [options] ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
+
+.SH OPTIONS
+.TP
+-m STR
+metric (default psnr):
+    mse   -  MSE / MAX^2, MAX = 255
+    psnr  -  PSNR
+    nhw-n -  NHW neatness
+    nhw-c -  NHW convolutional
+    nhw-r -  NHW relative
+.TP
+-q
+quiet mode
+.TP
+-y
+YCbCr mode
+.TP
+-h
+show this help message and exit
+
+.SH EXAMPLE
+stbnhwmetrics -m nhw-r lena.png lena.quant444.png lena.quant444.nhw-r.png
+
+ Load: lena.png
+ image: 256x256:3
+ Load: lena.quant444.png
+ image: 256x256:3
+ type: nhw-r
+ metric: 0.116387
+ Save png: lena.quant444.nhw-r.png
+
+.SH COPYRIGHT
+Copyright (C) Raphael Canut - nhwcodec_at_gmail.com.
+All rights reserved.
+
+.SH SEE ALSO
+compare(1), gm(1), jpeg-compare(1)
+
+.SH CONTACTS
+Website: https://github.com/ImageProcessing-ElectronicPublications/stb-image-metrics

@@ -1,0 +1,10 @@
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define YCBCR_IMPLEMENTATION
+#define METRICS_NHW_IMPLEMENTATION
+#define METRICS_PSNR_IMPLEMENTATION
+#include "stb/stb_image.h"
+#include "stb/stb_image_write.h"
+#include "ycbcr.h"
+#include "metricspsnr.h"
+#include "metricsnhw.h"

@@ -1,0 +1,10 @@
+build/
+stbimmetrics
+Makefile
+CMakeCache.txt
+.o
+.cmake
+.vscode
+.cache
+.clangd
+a.out
