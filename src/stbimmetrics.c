@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
+#include "metricsum.h"
 #include "ycbcr.h"
 #include "metricspsnr.h"
 #include "metricsnhw.h"
@@ -27,6 +28,7 @@ void immetrics_usage(char* prog, char* metric)
     printf("\t\tnhw-c -\t NHW convolutional\n");
     printf("\t\tnhw-r -\t NHW relative\n");
     printf("\t-q\tquiet mode\n");
+    printf("\t-u\tUM mode (Universal scale of Metrics)\n");
     printf("\t-y\tYCbCr mode\n");
     printf("\t-h\tshow this help message and exit\n");
 }
@@ -38,6 +40,7 @@ int main(int argc, char **argv)
     char *metric = "psnr";
     int fhelp = 0;
     int fquiet = 0;
+    int fum = 0;
     int fycbcr = 0;
     int opt;
     const char *name_orig = NULL, *name_comp = NULL, *name_m = NULL;
@@ -46,7 +49,7 @@ int main(int argc, char **argv)
     size_t ki = 0, kd = 0;
     float neatness = 0.0f;
 
-    while ((opt = getopt(argc, argv, ":m:qyh")) != -1)
+    while ((opt = getopt(argc, argv, ":m:quyh")) != -1)
     {
         switch(opt)
         {
@@ -55,6 +58,9 @@ int main(int argc, char **argv)
             break;
         case 'q':
             fquiet = 1;
+            break;
+        case 'u':
+            fum = 1;
             break;
         case 'y':
             fycbcr = 1;
@@ -212,9 +218,20 @@ int main(int argc, char **argv)
             return 3;
         }
     }
+    if (fum)
+    {
+        neatness = metric_um(metric, neatness);
+    }
     if (!fquiet)
     {
-        printf("metric: %f\n", neatness);
+        if (!fum)
+        {
+            printf("metric: %f\n", neatness);
+        }
+        else
+        {
+            printf("UM: %f\n", neatness);
+        }       
     }
     else
     {

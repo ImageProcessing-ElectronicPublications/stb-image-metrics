@@ -18,7 +18,7 @@
 ****************************************************************************
 *  Metrics PSNR                                                            *
 *  file: metricspsnr.h                                                     *
-*  version: 0.2.5                                                          *
+*  version: 0.2.6                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -31,7 +31,7 @@
 #ifndef __METRICS_SMALLFRY__H
 #define __METRICS_SMALLFRY__H
 
-#define METRICS_SMALLFRY_VERSION "0.2.5"
+#define METRICS_SMALLFRY_VERSION "0.2.6"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static

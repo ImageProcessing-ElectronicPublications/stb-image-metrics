@@ -67,12 +67,48 @@ stbnhwmetrics ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
 - `dependencies.c` - API [stb](https://github.com/nothings/stb.git)
 - `metricsnhw.h` - [NHW metrics](https://github.com/rcanut/NHW_Neatness_Metrics/issues/1)
 - `metricspsnr.h` - metrics PSNR and MSE
+- `metricsum.h` - ["Universal Scale" of metrics (UM)](https://github.com/ImageProcessing-ElectronicPublications/jpeg-recompress)
 - `smallfry.h` - metrics [SMALLFRY, SHARPENBAD and Correlation](https://github.com/ImageProcessing-ElectronicPublications/libsmallfry)
 - `stb/` - [stb](https://github.com/nothings/stb.git)
 - `stbimmetrics.c` - CLI program.
-- `ycbcr.h` - YCbCr color space.
+- `ycbcr.h` - [YCbCr color space](https://en.wikipedia.org/wiki/YCbCr).
 
 ## Metrics
+
+"Universal Scale" of metrics (UM):
+
+```
+  0.0
+  ... (DIRTY) ...
+  0.5
+  ... (LOW) ...
+  0.75
+  ... (MEDIUM) ...
+  0.875
+  ... (SUBHIGH) ...
+  0.9375
+  ... (HIGH) ...
+  0.96875
+  ... (VERYHIGH) ...
+  1.0
+```
+
+Trends:
+
+```
+  UM = -216.75*MPE+1.73
+  UM = 1.10*sqrt(PNSR)-6.07
+  UM = 2.38*cor_sigma(cor_sigma(cor_sigma(SSIM)))-0.24
+  UM = 1.87*cor_sigma(cor_sigma(MS_SSIM))-0.02
+  UM = 0.0747*SMALLFRY-6.91
+  UM = 1.48*SHARPENBAD-0.26
+  UM = 3.00*COR-1.50
+  UM = 0.56*sqrt(sqrt(1.0/NHW-C))-0.95
+  UM = 0.62*sqrt(sqrt(1.0/NHW-N))-1.05
+  UM = 0.59*sqrt(sqrt(1.0/NHW-R))-1.12
+
+  cor_sigma(M) = 1.0-sqrt(1.0-M*M)
+```
 
 Origin and Compare:
 

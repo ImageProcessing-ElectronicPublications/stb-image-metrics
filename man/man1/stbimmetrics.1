@@ -7,14 +7,14 @@ stbimmetrics
 This utility compares two graphics files based on metrics.
 
 Includes metrics:
-- MSE / MAX^2, MAX = 255
-- PSNR
-- SMALLFRY
-- SHARPENBAD
-- correlation
-- NHW neatness
-- NHW convolutional
-- NHW relative
+ - MSE / MAX^2, MAX = 255
+ - PSNR
+ - SMALLFRY
+ - SHARPENBAD
+ - correlation
+ - NHW neatness
+ - NHW convolutional
+ - NHW relative
 
 The value of MSE metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
 
@@ -45,6 +45,9 @@ metric (default psnr):
 -q
 quiet mode
 .TP
+-u
+UM mode (Universal scale of Metrics)
+.TP
 -y
 YCbCr mode
 .TP
@@ -62,9 +65,38 @@ stbnhwmetrics -m nhw-r lena.png lena.quant444.png lena.quant444.nhw-r.png
  metric: 0.116387
  Save png: lena.quant444.nhw-r.png
 
+.SH NOTES
+"Universal Scale" of metrics (UM):
+  0.0
+  ... (DIRTY) ...
+  0.5
+  ... (LOW) ...
+  0.75
+  ... (MEDIUM) ...
+  0.875
+  ... (SUBHIGH) ...
+  0.9375
+  ... (HIGH) ...
+  0.96875
+  ... (VERYHIGH) ...
+  1.0
+.PP
+Trends:
+
+  UM = -216.75*MPE+1.73
+  UM = 1.10*sqrt(PNSR)-6.07
+  UM = 2.38*cor_sigma(cor_sigma(cor_sigma(SSIM)))-0.24
+  UM = 1.87*cor_sigma(cor_sigma(MS_SSIM))-0.02
+  UM = 0.0747*SMALLFRY-6.91
+  UM = 1.48*SHARPENBAD-0.26
+  UM = 3.00*COR-1.50
+  UM = 0.56*sqrt(sqrt(1.0/NHW-C))-0.95
+  UM = 0.62*sqrt(sqrt(1.0/NHW-N))-1.05
+  UM = 0.59*sqrt(sqrt(1.0/NHW-R))-1.12
+  cor_sigma(M) = 1.0-sqrt(1.0-M*M)
+
 .SH COPYRIGHT
-Copyright (C) Raphael Canut - nhwcodec_at_gmail.com.
-All rights reserved.
+This is free and unencumbered software released into the public domain.
 
 .SH SEE ALSO
 compare(1), gm(1), jpeg-compare(1)
