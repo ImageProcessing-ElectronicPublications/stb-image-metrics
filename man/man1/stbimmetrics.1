@@ -1,4 +1,4 @@
-.TH "StbImMetrics" 1 0.2.5 "8 Jan 2023" "User Manual"
+.TH "StbImMetrics" 1 0.2.7 "9 Jan 2023" "User Manual"
 
 .SH NAME
 stbimmetrics
@@ -9,6 +9,8 @@ This utility compares two graphics files based on metrics.
 Includes metrics:
  - MSE / MAX^2, MAX = 255
  - PSNR
+ - SSIM
+ - VIFP1
  - SMALLFRY
  - SHARPENBAD
  - correlation
@@ -18,7 +20,9 @@ Includes metrics:
 
 The value of MSE metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
 
-The value of PSNR metrics is from 1.0 (maximum difference) to inf.
+The value of PSNR metrics is from 0.0 (maximum difference) to inf.
+
+The value of SSIM and VIPF1 metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
 The value of SHARPENBAD metrics is from 1.0 (minimum difference) to -1.0 (maximum difference).
 
@@ -35,6 +39,8 @@ stbimmetrics [options] ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
 metric (default psnr):
     mse      - MSE / MAX^2, MAX = 255
     psnr     - PSNR
+    ssim     - SSIM
+    vifp1    - VIFP 1 layer
     smallfry - SMALLFRY
     shbad    - SHARPENBAD
     cor      - correlation
