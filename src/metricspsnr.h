@@ -2,7 +2,7 @@
 ****************************************************************************
 *  Metrics PSNR                                                            *
 *  file: metricspsnr.h                                                     *
-*  version: 0.2.4                                                          *
+*  version: 0.2.5                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -14,7 +14,7 @@
 #ifndef __METRICS_PSNR__H
 #define __METRICS_PSNR__H
 
-#define METRICS_VERSION "0.2.4"
+#define METRICS_VERSION "0.2.5"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static

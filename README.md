@@ -3,15 +3,23 @@
 This utility compares two graphics files based on metrics.
 
 Includes metrics:
+
 - MSE / MAX^2, MAX = 255
 - PSNR
-- NHW neatness
-- NHW convolutional
-- NHW relative
+- [SMALLFRY](https://github.com/dwbuiten/smallfry)
+- [SHARPENBAD](https://github.com/ImageProcessing-ElectronicPublications/libsmallfry)
+- [Correlation](https://github.com/ImageProcessing-ElectronicPublications/libsmallfry)
+- [NHW neatness](https://github.com/rcanut/NHW_Neatness_Metrics)
+- [NHW convolutional](https://github.com/rcanut/NHW_Neatness_Metrics/issues/1)
+- [NHW relative](https://github.com/rcanut/NHW_Neatness_Metrics/issues/1)
 
 The value of MSE metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
 
 The value of PSNR metrics is from 1.0 (maximum difference) to inf.
+
+The value of SHARPENBAD metrics is from 1.0 (minimum difference) to -1.0 (maximum difference).
+
+The value of Correlation metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
 The value of NHW metrics is from 0.0 (minimum difference) to 1.0 (maximum difference) ([origin project code](https://github.com/rcanut/NHW_Neatness_Metrics/issues/1)).
 
@@ -57,8 +65,9 @@ stbnhwmetrics ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
 ## structure
 
 - `dependencies.c` - API [stb](https://github.com/nothings/stb.git)
-- `metricsnhw.h` - NHW metrics ([origin project code](https://github.com/rcanut/NHW_Neatness_Metrics/issues/1))
+- `metricsnhw.h` - [NHW metrics](https://github.com/rcanut/NHW_Neatness_Metrics/issues/1)
 - `metricspsnr.h` - metrics PSNR and MSE
+- `smallfry.h` - metrics [SMALLFRY, SHARPENBAD and Correlation](https://github.com/ImageProcessing-ElectronicPublications/libsmallfry)
 - `stb/` - [stb](https://github.com/nothings/stb.git)
 - `stbimmetrics.c` - CLI program.
 - `ycbcr.h` - YCbCr color space.
@@ -85,6 +94,9 @@ Save png: lena.quant444.psnr.png
 
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.mse.png) MSE: 0.013604
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.psnr.png) PSNR: 18.663233
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.smallfry.png) SMALLFRY: 83.753342
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.shbad.png) SHARPENBAD: -0.213132
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.cor.png) Corelation: 0.953666
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-n.png) NHW-N: 0.072673
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-c.png) NHW-C: 0.145290
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-r.png) NHW-R: 0.116387

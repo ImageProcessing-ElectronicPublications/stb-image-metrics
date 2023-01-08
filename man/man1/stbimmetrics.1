@@ -1,4 +1,4 @@
-.TH "StbImMetrics" 1 0.2.4 "8 Jan 2023" "User Manual"
+.TH "StbImMetrics" 1 0.2.5 "8 Jan 2023" "User Manual"
 
 .SH NAME
 stbimmetrics
@@ -9,6 +9,9 @@ This utility compares two graphics files based on metrics.
 Includes metrics:
 - MSE / MAX^2, MAX = 255
 - PSNR
+- SMALLFRY
+- SHARPENBAD
+- correlation
 - NHW neatness
 - NHW convolutional
 - NHW relative
@@ -16,6 +19,10 @@ Includes metrics:
 The value of MSE metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
 
 The value of PSNR metrics is from 1.0 (maximum difference) to inf.
+
+The value of SHARPENBAD metrics is from 1.0 (minimum difference) to -1.0 (maximum difference).
+
+The value of Correlation metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
 The value of NHW metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
 
@@ -26,11 +33,14 @@ stbimmetrics [options] ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
 .TP
 -m STR
 metric (default psnr):
-    mse   -  MSE / MAX^2, MAX = 255
-    psnr  -  PSNR
-    nhw-n -  NHW neatness
-    nhw-c -  NHW convolutional
-    nhw-r -  NHW relative
+    mse      - MSE / MAX^2, MAX = 255
+    psnr     - PSNR
+    smallfry - SMALLFRY
+    shbad    - SHARPENBAD
+    cor      - correlation
+    nhw-n    - NHW neatness
+    nhw-c    - NHW convolutional
+    nhw-r    - NHW relative
 .TP
 -q
 quiet mode

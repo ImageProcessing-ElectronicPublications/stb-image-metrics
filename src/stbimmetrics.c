@@ -10,6 +10,7 @@
 #include "ycbcr.h"
 #include "metricspsnr.h"
 #include "metricsnhw.h"
+#include "smallfry.h"
 
 void immetrics_usage(char* prog, char* metric)
 {
@@ -19,6 +20,9 @@ void immetrics_usage(char* prog, char* metric)
     printf("\t-m STR\tmetric (default %s):\n", metric);
     printf("\t\tmse -\t MSE / MAX^2, MAX = 255\n");
     printf("\t\tpsnr -\t PSNR\n");
+    printf("\t\tsmallfry -\t SMALLFRY\n");
+    printf("\t\tshbad -\t SHARPENBAD\n");
+    printf("\t\tcor -\t correlation\n");
     printf("\t\tnhw-n -\t NHW neatness\n");
     printf("\t\tnhw-c -\t NHW convolutional\n");
     printf("\t\tnhw-r -\t NHW relative\n");
@@ -189,6 +193,18 @@ int main(int argc, char **argv)
         else if (strcmp(metric, "nhw-r") == 0)
         {
             neatness = metrics_nhw_relative(data_orig, data_comp, data_m, height, width, channels);
+        }
+        else if (strcmp(metric, "smallfry") == 0)
+        {
+            neatness = metric_smallfry(data_orig, data_comp, data_m, height, width, channels);
+        }
+        else if (strcmp(metric, "shbad") == 0)
+        {
+            neatness = metric_sharpenbad(data_orig, data_comp, data_m, height, width, channels);
+        }
+        else if (strcmp(metric, "cor") == 0)
+        {
+            neatness = metric_cor(data_orig, data_comp, data_m, height, width, channels);
         }
         else
         {
