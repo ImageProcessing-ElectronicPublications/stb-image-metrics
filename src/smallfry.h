@@ -18,7 +18,7 @@
 ****************************************************************************
 *  Metrics PSNR                                                            *
 *  file: metricspsnr.h                                                     *
-*  version: 0.2.7                                                          *
+*  version: 0.2.8                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -31,7 +31,7 @@
 #ifndef __METRICS_SMALLFRY__H
 #define __METRICS_SMALLFRY__H
 
-#define METRICS_SMALLFRY_VERSION "0.2.7"
+#define METRICS_SMALLFRY_VERSION "0.2.8"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -390,7 +390,6 @@ METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned ch
     float im1, im2;
     float sum1, sum2, sum1l, sum2l;
     float sum12, sumq1, sumq2, q12, sum12l, sumq1l, sumq2l, sumq, cor;
-    float suma1l, suma2l, suma1, suma2;
     int y, x, d;
     size_t k, n;
 
@@ -424,15 +423,11 @@ METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned ch
     sum12 = 0.0f;
     sumq1 = 0.0f;
     sumq2 = 0.0f;
-    suma1 = 0.0f;
-    suma2 = 0.0f;
     for (y = 0; y < height; y++)
     {
         sum12l = 0.0f;
         sumq1l = 0.0f;
         sumq2l = 0.0f;
-        suma1l = 0.0f;
-        suma2l = 0.0f;
         for (x = 0; x < width; x++)
         {
             for (d = 0; d < channels; d++)
@@ -442,8 +437,6 @@ METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned ch
                 im2 = (float)cmp[k];
                 im2 -= sum2;
                 q12 = (im1 * im2);
-                suma1l += ((im1 < 0) ? -im1 : im1);
-                suma2l += ((im2 < 0) ? -im2 : im2);
                 sum12l += q12;
                 sumq1l += (im1 * im1);
                 sumq2l += (im2 * im2);
@@ -453,8 +446,6 @@ METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned ch
         sum12 += sum12l;
         sumq1 += sumq1l;
         sumq2 += sumq2l;
-        suma1 += suma1l;
-        suma2 += suma2l;
     }
     sumq = sqrt(sumq1 * sumq2);
     if (sumq > 0.0f)
@@ -466,18 +457,20 @@ METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned ch
     cor = (cor < 0.0f) ? -cor : cor;
     if (delta)
     {
-        suma1 /= k;
-        suma2 /= k;
-        q12 = (suma1 + suma2);
+        sumq1 /= k;
+        sumq2 /= k;
+        sumq1 = sqrt(sumq1);
+        sumq2 = sqrt(sumq2);
+        q12 = (sumq1 + sumq2);
         if (q12 > 0.0f)
         {
-            suma1 *= (2.0f / q12);
-            suma2 *= (2.0f / q12);
+            sumq1 *= (2.0f / q12);
+            sumq2 *= (2.0f / q12);
         }
         else
         {
-            suma1 = 1.0f;
-            suma2 = 1.0f;
+            sumq1 = 1.0f;
+            sumq2 = 1.0f;
         }
         k = 0;
         for (y = 0; y < height; y++)
@@ -488,21 +481,16 @@ METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned ch
                 {
                     im1 = (float)ref[k];
                     im1 -= sum1;
-                    im1 *= suma2;
+                    im1 *= sumq2;
                     im2 = (float)cmp[k];
                     im2 -= sum2;
-                    im2 *= suma1;
-                    q12 = (im1 > im2) ? (im1 - im2) : (im2 > im1);
+                    im2 *= sumq1;
+                    q12 = (im1 > im2) ? (im1 - im2) : (im2 - im1);
                     q12 = 255.0f - q12;
                     delta[k] = (unsigned char)((q12 < 255.0f) ? q12 : 255);
                     k++;
                 }
             }
-            sum12 += sum12l;
-            sumq1 += sumq1l;
-            sumq2 += sumq2l;
-            suma1 += suma1l;
-            suma2 += suma2l;
         }
     }
 

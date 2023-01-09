@@ -2,7 +2,7 @@
 ****************************************************************************
 *  YCbCr Filter                                                            *
 *  file: ycbcr.h                                                           *
-*  version: 0.2.7                                                          *
+*  version: 0.2.8                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -13,7 +13,7 @@
 #ifndef __YCBCR__H
 #define __YCBCR__H
 
-#define YCBCR_VERSION "0.2.7"
+#define YCBCR_VERSION "0.2.8"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static

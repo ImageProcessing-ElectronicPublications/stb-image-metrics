@@ -6,7 +6,7 @@ https://github.com/rolinh/VQMT
 ****************************************************************************
 *  Metrics SSIM                                                            *
 *  file: ssim.h                                                            *
-*  version: 0.2.7                                                          *
+*  version: 0.2.8                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -19,7 +19,7 @@ https://github.com/rolinh/VQMT
 #ifndef SSIM_H_
 #define SSIM_H_
 
-#define METRICS_SSIM_VERSION "0.2.7"
+#define METRICS_SSIM_VERSION "0.2.8"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -374,7 +374,7 @@ METRICSAPI float metric_vifp1(unsigned char *ref, unsigned char *cmp, unsigned c
                 s1 = (s1 < eps) ? 0.0f : s1;
                 g = (s2 < eps) ? 0.0f : g;
                 sv = (s2 < eps) ? 0.0f : sv;
-                sv = (g < 0.0f) ? 0.0f : g;
+                sv = (g < 0.0f) ? s2 : sv;
                 g = (g < 0.0f) ? 0.0f : g;
                 sv = (sv < eps) ? eps : sv;
                 //vifp1

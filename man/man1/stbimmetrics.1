@@ -1,4 +1,4 @@
-.TH "StbImMetrics" 1 0.2.7 "9 Jan 2023" "User Manual"
+.TH "StbImMetrics" 1 0.2.8 "9 Jan 2023" "User Manual"
 
 .SH NAME
 stbimmetrics
@@ -9,6 +9,8 @@ This utility compares two graphics files based on metrics.
 Includes metrics:
  - MSE / MAX^2, MAX = 255
  - PSNR
+ - MSE / MAX^2 of correlation, MAX = 255
+ - PSNR of correlation
  - SSIM
  - VIFP1
  - SMALLFRY
@@ -39,6 +41,8 @@ stbimmetrics [options] ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
 metric (default psnr):
     mse      - MSE / MAX^2, MAX = 255
     psnr     - PSNR
+    mse-c    - MSE / MAX^2 of correlation, MAX = 255
+    psnr-c   - PSNR of correlation
     ssim     - SSIM
     vifp1    - VIFP 1 layer
     smallfry - SMALLFRY

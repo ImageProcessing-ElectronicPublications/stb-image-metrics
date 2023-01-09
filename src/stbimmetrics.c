@@ -20,16 +20,18 @@ void immetrics_usage(char* prog, char* metric)
     printf("usage: %s [options] image_in_orig image_in_comp [metric_out.png]\n", prog);
     printf("options:\n");
     printf("\t-m STR\tmetric (default %s):\n", metric);
-    printf("\t\tmse -\t MSE / MAX^2, MAX = 255\n");
-    printf("\t\tpsnr -\t PSNR\n");
-    printf("\t\tssim -\t SSIM\n");
+    printf("\t\tmse      -\t MSE / MAX^2, MAX = 255\n");
+    printf("\t\tpsnr     -\t PSNR\n");
+    printf("\t\tmse-c    -\t MSE / MAX^2 of correlation, MAX = 255\n");
+    printf("\t\tpsnr-c   -\t PSNR of correlation\n");
+    printf("\t\tssim     -\t SSIM\n");
     printf("\t\tsmallfry -\t SMALLFRY\n");
-    printf("\t\tshbad -\t SHARPENBAD\n");
-    printf("\t\tcor -\t correlation\n");
-    printf("\t\tvifp1 -\t VIFP 1 layer\n");
-    printf("\t\tnhw-n -\t NHW neatness\n");
-    printf("\t\tnhw-c -\t NHW convolutional\n");
-    printf("\t\tnhw-r -\t NHW relative\n");
+    printf("\t\tshbad    -\t SHARPENBAD\n");
+    printf("\t\tcor      -\t correlation\n");
+    printf("\t\tvifp1    -\t VIFP 1 layer\n");
+    printf("\t\tnhw-n    -\t NHW neatness\n");
+    printf("\t\tnhw-c    -\t NHW convolutional\n");
+    printf("\t\tnhw-r    -\t NHW relative\n");
     printf("\t-q\tquiet mode\n");
     printf("\t-u\tUM mode (Universal scale of Metrics)\n");
     printf("\t-y\tYCbCr mode\n");
@@ -191,6 +193,14 @@ int main(int argc, char **argv)
         {
             neatness = metrics_psnr(data_orig, data_comp, data_m, height, width, channels);
         }
+        else if (strcmp(metric, "mse-c") == 0)
+        {
+            neatness = metrics_mse_cor(data_orig, data_comp, data_m, height, width, channels);
+        }
+        else if (strcmp(metric, "psnr-c") == 0)
+        {
+            neatness = metrics_psnr_cor(data_orig, data_comp, data_m, height, width, channels);
+        }
         else if (strcmp(metric, "smallfry") == 0)
         {
             neatness = metric_smallfry(data_orig, data_comp, data_m, height, width, channels);
@@ -242,7 +252,7 @@ int main(int argc, char **argv)
         else
         {
             printf("UM: %f\n", neatness);
-        }       
+        }
     }
     else
     {

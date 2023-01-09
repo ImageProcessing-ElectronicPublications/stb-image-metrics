@@ -6,6 +6,8 @@ Includes metrics:
 
 - MSE / MAX^2, MAX = 255
 - PSNR
+- MSE / MAX^2 of correlation, MAX = 255
+- PSNR of correlation
 - [SSIM](https://github.com/rolinh/VQMT)
 - [VIFP1](https://github.com/rolinh/VQMT)
 - [SMALLFRY](https://github.com/dwbuiten/smallfry)
@@ -135,8 +137,10 @@ Save png: lena.quant444.psnr.png
 
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.mse.png) MSE: 0.013604
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.psnr.png) PSNR: 18.663233
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.mse-c.png) MSE-C: 0.006495, UM: -
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.psnr-c.png) PSNR-C: 21.873943, UM: -
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.ssim.png) SSIM: 0.618509, UM: -0.239359 
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.vifp1.png) VIFP1: 0.806863, UM: -
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.vifp1.png) VIFP1: 0.170903, UM: -
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.smallfry.png) SMALLFRY: 83.753342
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.shbad.png) SHARPENBAD: -0.213132
 * ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.cor.png) Corelation: 0.953666
