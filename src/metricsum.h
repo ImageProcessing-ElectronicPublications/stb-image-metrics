@@ -2,7 +2,7 @@
 ****************************************************************************
 *  Metrics UM                                                              *
 *  file: metricsum.h                                                       *
-*  version: 0.2.8                                                          *
+*  version: 0.2.9                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -15,7 +15,7 @@
 #ifndef __METRICS_UM__H
 #define __METRICS_UM__H
 
-#define METRICS_VERSION "0.2.8"
+#define METRICS_VERSION "0.2.9"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static

@@ -6,7 +6,7 @@ https://github.com/rolinh/VQMT
 ****************************************************************************
 *  Metrics SSIM                                                            *
 *  file: ssim.h                                                            *
-*  version: 0.2.8                                                          *
+*  version: 0.2.9                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -19,7 +19,7 @@ https://github.com/rolinh/VQMT
 #ifndef SSIM_H_
 #define SSIM_H_
 
-#define METRICS_SSIM_VERSION "0.2.8"
+#define METRICS_SSIM_VERSION "0.2.9"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -61,9 +61,9 @@ METRICSAPI float metric_ssim(unsigned char *ref, unsigned char *cmp, unsigned ch
 {
     size_t k, kx[13], ky[13], kf, line, size;
     int y, x, d, yf, xf;
-    int i, j, iradius = 7;
+    int i, j, j0, iradius = 7;
     float imc, sc, radius = 1.5f;
-    float gaussmat[7], vec1[13], vec2[13];
+    float gaussmat[7], vec1[13], v21[13], v22[13], v23[13], v24[13], v25[13];
     float sum, suml, t, tt;
     float g1, g2, s1, s2, s12;
     float iq1, iq2, iq12, gq1, gq2, gq12;
@@ -98,94 +98,104 @@ METRICSAPI float metric_ssim(unsigned char *ref, unsigned char *cmp, unsigned ch
     }
 
     //ssim
-    k = 0;
     sum = 0.0f;
-    for (y = 0; y < height; y++)
+    for (d = 0; d < channels; d++)
     {
-        ky[6] = k;
-        for (i = 1; i < 7; i++)
+        k = d;
+        for (y = 0; y < height; y++)
         {
-
-            ky[6 - i] = ky[6 - i + 1] - (((y - i) < 0) ? 0 : line);
-            ky[6 + i] = ky[6 + i - 1] + (((y + i) < height) ? line : 0);
-        }
-        suml = 0.0f;
-        for (x = 0; x < width; x++)
-        {
-            kx[6] = k - ky[6];
-            for (j = 1; j < 7; j++)
+            ky[6] = k;
+            for (i = 1; i < 7; i++)
             {
 
-                kx[6 - j] = kx[6 - j + 1] - (((x - j) < 0) ? 0 : channels);
-                kx[6 + j] = kx[6 + j - 1] + (((x + j) < width) ? channels : 0);
+                ky[6 - i] = ky[6 - i + 1] - (((y - i) < 0) ? 0 : line);
+                ky[6 + i] = ky[6 + i - 1] + (((y + i) < height) ? line : 0);
             }
-            for (d = 0; d < channels; d++)
+            suml = 0.0f;
+            for (x = 0; x < width; x++)
             {
+                kx[6] = k - ky[6];
+                for (j = 1; j < 7; j++)
+                {
+
+                    kx[6 - j] = kx[6 - j + 1] - (((x - j) < 0) ? 0 : channels);
+                    kx[6 + j] = kx[6 + j - 1] + (((x + j) < width) ? channels : 0);
+                }
+                //optimize gauss blur
+                j0 = (x < 13) ? x : 12;
+                for (j = 0; j < j0; j++)
+                {
+                    v21[j] = v21[j + 1];
+                    v22[j] = v22[j + 1];
+                    v23[j] = v23[j + 1];
+                    v24[j] = v24[j + 1];
+                    v25[j] = v25[j + 1];
+                }
                 //gauss of ref = g1
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)ref[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)ref[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v21[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                g1 = gaussblur(vec2, gaussmat, 7);
+                g1 = gaussblur(v21, gaussmat, 7);
                 //gauss of cmp = g2
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)cmp[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)cmp[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v22[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                g2 = gaussblur(vec2, gaussmat, 7);
+                g2 = gaussblur(v22, gaussmat, 7);
                 //gauss of ref*ref = s1
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)ref[kf] * (float)ref[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)ref[kf] * (float)ref[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v23[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                s1 = gaussblur(vec2, gaussmat, 7);
+                s1 = gaussblur(v23, gaussmat, 7);
                 //gauss of cmp*cmp = s2
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)cmp[kf]*(float)cmp[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)cmp[kf]*(float)cmp[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v24[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                s2 = gaussblur(vec2, gaussmat, 7);
+                s2 = gaussblur(v24, gaussmat, 7);
                 //gauss of ref*cmp = s12
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)ref[kf]*(float)cmp[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)ref[kf]*(float)cmp[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v25[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                s12 = gaussblur(vec2, gaussmat, 7);
+                s12 = gaussblur(v25, gaussmat, 7);
                 // ssim_map = fs * fg;
                 // fs = (2*s12 + C2))/(s1 + s2 + C2);
                 // fg = (2*gq12 + C1)/(gq1 + gq2 + C1);
@@ -211,10 +221,10 @@ METRICSAPI float metric_ssim(unsigned char *ref, unsigned char *cmp, unsigned ch
                     ssim *= 255.0f;
                     delta[k] = (unsigned char)((ssim < 0.0f) ? 0 : (ssim < 255.0f) ? ssim : 255);
                 }
-                k++;
+                k += channels;
             }
+            sum += suml;
         }
-        sum += suml;
     }
     sum /= (float)k;
 
@@ -225,9 +235,9 @@ METRICSAPI float metric_vifp1(unsigned char *ref, unsigned char *cmp, unsigned c
 {
     size_t k, kx[13], ky[13], kf, line, size;
     int y, x, d, yf, xf;
-    int i, j, iradius = 7;
+    int i, j, j0, iradius = 7;
     float imc, sc, radius = 1.5f;
-    float gaussmat[7], vec1[13], vec2[13];
+    float gaussmat[7], vec1[13], v21[13], v22[13], v23[13], v24[13], v25[13];
     float sum, suml, t, tt;
     float g1, g2, s1, s2, s12;
     float iq1, iq2, iq12, gq1, gq2, gq12;
@@ -265,96 +275,104 @@ METRICSAPI float metric_vifp1(unsigned char *ref, unsigned char *cmp, unsigned c
     k = 0;
     num = 0.0f;
     den = 0.0f;
-    for (y = 0; y < height; y++)
+    for (d = 0; d < channels; d++)
     {
-        ky[6] = k;
-        for (i = 1; i < 7; i++)
+        k = d;
+        for (y = 0; y < height; y++)
         {
-
-            ky[6 - i] = ky[6 - i + 1] - (((y - i) < 0) ? 0 : line);
-            ky[6 + i] = ky[6 + i - 1] + (((y + i) < height) ? line : 0);
-        }
-        numl = 0.0f;
-        denl = 0.0f;
-        for (x = 0; x < width; x++)
-        {
-            kx[6] = k - ky[6];
-            for (j = 1; j < 7; j++)
+            ky[6] = k;
+            for (i = 1; i < 7; i++)
             {
 
-                kx[6 - j] = kx[6 - j + 1] - (((x - j) < 0) ? 0 : channels);
-                kx[6 + j] = kx[6 + j - 1] + (((x + j) < width) ? channels : 0);
+                ky[6 - i] = ky[6 - i + 1] - (((y - i) < 0) ? 0 : line);
+                ky[6 + i] = ky[6 + i - 1] + (((y + i) < height) ? line : 0);
             }
-            for (d = 0; d < channels; d++)
+            numl = 0.0f;
+            denl = 0.0f;
+            for (x = 0; x < width; x++)
             {
+                kx[6] = k - ky[6];
+                for (j = 1; j < 7; j++)
+                {
+
+                    kx[6 - j] = kx[6 - j + 1] - (((x - j) < 0) ? 0 : channels);
+                    kx[6 + j] = kx[6 + j - 1] + (((x + j) < width) ? channels : 0);
+                }
+                //optimize gauss blur
+                j0 = (x < 13) ? x : 12;
+                for (j = 0; j < j0; j++)
+                {
+                    v21[j] = v21[j + 1];
+                    v22[j] = v22[j + 1];
+                    v23[j] = v23[j + 1];
+                    v24[j] = v24[j + 1];
+                    v25[j] = v25[j + 1];
+                }
                 //gauss of ref = g1
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)ref[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)ref[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v21[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                g1 = gaussblur(vec2, gaussmat, 7);
+                g1 = gaussblur(v21, gaussmat, 7);
                 //gauss of cmp = g2
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)cmp[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)cmp[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v22[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                g2 = gaussblur(vec2, gaussmat, 7);
+                g2 = gaussblur(v22, gaussmat, 7);
                 //gauss of ref*ref = s1
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)ref[kf] * (float)ref[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)ref[kf] * (float)ref[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v23[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                s1 = gaussblur(vec2, gaussmat, 7);
+                s1 = gaussblur(v23, gaussmat, 7);
                 //gauss of cmp*cmp = s2
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)cmp[kf]*(float)cmp[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)cmp[kf]*(float)cmp[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v24[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                s2 = gaussblur(vec2, gaussmat, 7);
+                s2 = gaussblur(v24, gaussmat, 7);
                 //gauss of ref*cmp = s12
-                for (i = 0; i < 13; i++)
+                for (j = j0; j < 13; j++)
                 {
-                    for (j = 0; j < 13; j++)
+                    for (i = 0; i < 13; i++)
                     {
-                        kf = ky[i] + kx[j] + d;
-                        vec1[j] = (float)ref[kf]*(float)cmp[kf];
+                        kf = ky[i] + kx[j];
+                        vec1[i] = (float)ref[kf]*(float)cmp[kf];
                     }
                     //gauss 1d
-                     vec2[i] = gaussblur(vec1, gaussmat, 7);
+                     v25[j] = gaussblur(vec1, gaussmat, 7);
                 }
                 //gauss 1d
-                s12 = gaussblur(vec2, gaussmat, 7);
-                // ssim_map = fs * fg;
-                // fs = (2*s12 + C2))/(s1 + s2 + C2);
-                // fg = (2*gq12 + C1)/(gq1 + gq2 + C1);
+                s12 = gaussblur(v25, gaussmat, 7);
                 iq1 = (float)ref[k] * (float)ref[k];
                 iq2 = (float)cmp[k] * (float)cmp[k];
                 iq12 = (float)ref[k] * (float)cmp[k];
@@ -390,12 +408,11 @@ METRICSAPI float metric_vifp1(unsigned char *ref, unsigned char *cmp, unsigned c
                     vifp1 *= 255.0f;
                     delta[k] = (unsigned char)((vifp1 < 0.0f) ? 0 : (vifp1 < 255.0f) ? vifp1 : 255);
                 }
-                k++;
+                k += channels;
             }
+            num += numl;
+            den += denl;
         }
-        num += numl;
-        den += denl;
-
     }
     sum = (den > 0.0f) ? (num / den) : 1.0f;
 
