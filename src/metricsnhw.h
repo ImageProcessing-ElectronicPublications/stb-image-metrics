@@ -6,7 +6,7 @@ https://github.com/rcanut/NHW_Neatness_Metrics/issues/1
 ****************************************************************************
 *  Metrics NHW                                                             *
 *  file: metricsnhw.h                                                      *
-*  version: 0.2.9                                                          *
+*  version: 0.3.0                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -18,7 +18,7 @@ https://github.com/rcanut/NHW_Neatness_Metrics/issues/1
 #ifndef __METRICS_NHW__H
 #define __METRICS_NHW__H
 
-#define METRICSNHW_VERSION "0.2.9"
+#define METRICSNHW_VERSION "0.3.0"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static

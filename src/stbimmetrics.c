@@ -242,6 +242,10 @@ int main(int argc, char **argv)
     if (fum)
     {
         neatness = metric_um(metric, neatness);
+        if (name_m)
+        {
+            (void)metric_um_image(data_m, height, width, channels, metric, neatness);
+        }
     }
     if (!fquiet)
     {

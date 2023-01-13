@@ -1,4 +1,4 @@
-.TH "StbImMetrics" 1 0.2.8 "9 Jan 2023" "User Manual"
+.TH "StbImMetrics" 1 0.3.0 "13 Jan 2023" "User Manual"
 
 .SH NAME
 stbimmetrics
@@ -93,17 +93,18 @@ stbnhwmetrics -m nhw-r lena.png lena.quant444.png lena.quant444.nhw-r.png
 .PP
 Trends:
 
-  UM = -216.75*MPE+1.73
-  UM = 1.10*sqrt(PNSR)-6.07
-  UM = 2.38*cor_sigma(cor_sigma(cor_sigma(SSIM)))-0.24
-  UM = 1.87*cor_sigma(cor_sigma(MS_SSIM))-0.02
-  UM = 0.0747*SMALLFRY-6.91
-  UM = 1.48*SHARPENBAD-0.26
-  UM = 3.00*COR-1.50
-  UM = 0.56*sqrt(sqrt(1.0/NHW-C))-0.95
-  UM = 0.62*sqrt(sqrt(1.0/NHW-N))-1.05
-  UM = 0.59*sqrt(sqrt(1.0/NHW-R))-1.12
-  cor_sigma(M) = 1.0-sqrt(1.0-M*M)
+  UM = 0.148 * sqrt(sqrt(1.0 / MSE)) - 0.53
+  UM = 0.94 * sqrt(PNSR) - 4.94
+  UM = 8.57 * cor_sigma(cor_sigma(cor_sigma(SSIM))) + 0.34
+  UM = 2.21 * cor_sigma(VIFP1) + 0.36
+  UM = 0.0735 * SMALLFRY - 6.50
+  UM = 1.46 * SHARPENBAD - 0.04
+  UM = 3.92 * cor_sigma(cor_sigma(COR)) - 1.79
+  UM = -0.049 * sqrt(sqrt(1.0 / NHW-N)) + 0.83
+  UM = 1.36 * sqrt(sqrt(1.0 / NHW-C)) - 2.61
+  UM = 0.96 * sqrt(sqrt(1.0 / NHW-R)) - 1.98
+
+  cor_sigma(M) = 1.0 - sqrt(1.0 - M * M)
 
 .SH COPYRIGHT
 This is free and unencumbered software released into the public domain.
