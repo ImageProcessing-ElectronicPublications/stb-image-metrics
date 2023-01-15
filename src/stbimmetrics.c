@@ -20,10 +20,10 @@ void immetrics_usage(char* prog, char* metric)
     printf("usage: %s [options] image_in_orig image_in_comp [metric_out.png]\n", prog);
     printf("options:\n");
     printf("\t-m STR\tmetric (default %s):\n", metric);
+    printf("\t-c\tcorrelation mode: for MSE, PSNR, SDSNR\n");
     printf("\t\tmse      -\t MSE / MAX^2, MAX = 255\n");
     printf("\t\tpsnr     -\t PSNR\n");
-    printf("\t\tmse-c    -\t MSE / MAX^2 of correlation, MAX = 255\n");
-    printf("\t\tpsnr-c   -\t PSNR of correlation\n");
+    printf("\t\tsdsnr    -\t SDSNR\n");
     printf("\t\tssim     -\t SSIM\n");
     printf("\t\tsmallfry -\t SMALLFRY\n");
     printf("\t\tshbad    -\t SHARPENBAD\n");
@@ -43,6 +43,7 @@ int main(int argc, char **argv)
     int height = 0, width = 0, channels = 0;
     int height_c = 0, width_c = 0, channels_c = 0;
     char *metric = "psnr";
+    int corel = 0;
     int fhelp = 0;
     int fquiet = 0;
     int fum = 0;
@@ -54,10 +55,13 @@ int main(int argc, char **argv)
     size_t ki = 0, kd = 0;
     float neatness = 0.0f;
 
-    while ((opt = getopt(argc, argv, ":m:quyh")) != -1)
+    while ((opt = getopt(argc, argv, ":cm:quyh")) != -1)
     {
         switch(opt)
         {
+        case 'c':
+            corel = 1;
+            break;
         case 'm':
             metric = optarg;
             break;
@@ -187,19 +191,15 @@ int main(int argc, char **argv)
     {
         if (strcmp(metric, "mse") == 0)
         {
-            neatness = metrics_mse(data_orig, data_comp, data_m, height, width, channels);
+            neatness = metrics_mse(data_orig, data_comp, data_m, height, width, channels, corel);
         }
         else if (strcmp(metric, "psnr") == 0)
         {
-            neatness = metrics_psnr(data_orig, data_comp, data_m, height, width, channels);
+            neatness = metrics_psnr(data_orig, data_comp, data_m, height, width, channels, corel);
         }
-        else if (strcmp(metric, "mse-c") == 0)
+        else if (strcmp(metric, "sdsnr") == 0)
         {
-            neatness = metrics_mse_cor(data_orig, data_comp, data_m, height, width, channels);
-        }
-        else if (strcmp(metric, "psnr-c") == 0)
-        {
-            neatness = metrics_psnr_cor(data_orig, data_comp, data_m, height, width, channels);
+            neatness = metrics_sdsnr(data_orig, data_comp, data_m, height, width, channels, corel);
         }
         else if (strcmp(metric, "smallfry") == 0)
         {

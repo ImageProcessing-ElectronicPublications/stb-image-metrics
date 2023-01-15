@@ -6,8 +6,7 @@ Includes metrics:
 
 - MSE / MAX^2, MAX = 255
 - PSNR
-- MSE / MAX^2 of correlation, MAX = 255
-- PSNR of correlation
+- SDSNR
 - [SSIM](https://github.com/rolinh/VQMT)
 - [VIFP1](https://github.com/rolinh/VQMT)
 - [SMALLFRY](https://github.com/dwbuiten/smallfry)
@@ -19,7 +18,7 @@ Includes metrics:
 
 The value of MSE metrics is from 0.0 (minimum difference) to 1.0 (maximum difference).
 
-The value of PSNR metrics is from 0.0 (maximum difference) to inf.
+The value of PSNR and SDSNR metrics is from 0.0 (maximum difference) to inf.
 
 The value of [SSIM](https://github.com/rolinh/VQMT) and [VIFP1](https://github.com/rolinh/VQMT) metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
@@ -103,16 +102,17 @@ stbnhwmetrics ${IMAGE_ORIG_PATH} ${IMAGE_COMPARE_PATH} [metric.out.png]
 Trends:
 
 ```
-  UM = 0.148 * sqrt(sqrt(1.0 / MSE)) - 0.53
-  UM = 0.94 * sqrt(PNSR) - 4.94
-  UM = 8.57 * cor_sigma(cor_sigma(cor_sigma(SSIM))) + 0.34
-  UM = 2.21 * cor_sigma(VIFP1) + 0.36
-  UM = 0.0735 * SMALLFRY - 6.50
-  UM = 1.46 * SHARPENBAD - 0.04
-  UM = 3.92 * cor_sigma(cor_sigma(COR)) - 1.79
-  UM = -0.049 * sqrt(sqrt(1.0 / NHW-N)) + 0.83
-  UM = 1.36 * sqrt(sqrt(1.0 / NHW-C)) - 2.61
-  UM = 0.96 * sqrt(sqrt(1.0 / NHW-R)) - 1.98
+  UM = 0.158 * sqrt(sqrt(1.0 / MSE)) - 0.63
+  UM = 0.99 * sqrt(PNSR) - 5.28
+  UM = 0.85 * sqrt(SDNSR) - 3.84
+  UM = 9.14 * cor_sigma(cor_sigma(cor_sigma(SSIM))) + 0.30
+  UM = 2.36 * cor_sigma(VIFP1) + 0.32
+  UM = 0.0777 * SMALLFRY - 6.93
+  UM = 1.53 * SHARPENBAD - 0.09
+  UM = 4.14 * cor_sigma(cor_sigma(COR)) - 1.94
+  UM = -0.055 * sqrt(sqrt(1.0 / NHW-N)) + 0.82
+  UM = 1.43 * sqrt(sqrt(1.0 / NHW-C)) - 2.82
+  UM = 1.03 * sqrt(sqrt(1.0 / NHW-R)) - 2.17
 
   cor_sigma(M) = 1.0 - sqrt(1.0 - M * M)
 ```
@@ -135,18 +135,17 @@ Save png: lena.quant444.psnr.png
 
 ```
 
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.mse.png) MSE: 0.013604, UM: -0.090790
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.mse-c.png) MSE-C: 0.006495, UM: -0.001628
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.psnr.png) PSNR: 18.663233, UM: -0.879109
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.psnr-c.png) PSNR-C: 21.873943, UM: -0.543659
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.cor.png) Corelation: 0.953666, UM: -0.672773
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.ssim.png) SSIM: 0.618509, UM: 0.342309
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.vifp1.png) VIFP1: 0.170903, UM: 0.392514
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.smallfry.png) SMALLFRY: 83.753342, UM: -0.344130
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.shbad.png) SHARPENBAD: -0.213132, UM: -0.351173
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-n.png) NHW-N: 0.072673, UM: 0.735626
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-c.png) NHW-C: 0.145290, UM: -0.407173
-* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-r.png) NHW-R: 0.116387, UM: -0.336402
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.mse.png) MSE: 0.013604, UM: -0.167366
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.psnr.png) PSNR: 18.663233, UM: -1.003105
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.sdsnr.png) SDSNR: 13.888971, UM: -0.672228
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.cor.png) Corelation: 0.953666, UM: -0.760071
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.ssim.png) SSIM: 0.618509, UM: 0.302463
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.vifp1.png) VIFP1: 0.170903, UM: 0.354721
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.smallfry.png) SMALLFRY: 83.753342, UM: -0.422366
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.shbad.png) SHARPENBAD: -0.213132, UM: -0.416092
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-n.png) NHW-N: 0.072673, UM: 0.714070
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-c.png) NHW-C: 0.145290, UM: -0.503793
+* ![metric](https://raw.githubusercontent.com/ImageProcessing-ElectronicPublications/stb-image-metrics-demo/main/images/lena.quant444.nhw-r.png) NHW-R: 0.116387, UM: -0.406557
 
 ---
 

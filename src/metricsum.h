@@ -2,7 +2,7 @@
 ****************************************************************************
 *  Metrics UM                                                              *
 *  file: metricsum.h                                                       *
-*  version: 0.3.0                                                          *
+*  version: 0.3.1                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -15,7 +15,7 @@
 #ifndef __METRICS_UM__H
 #define __METRICS_UM__H
 
-#define METRICS_VERSION "0.3.0"
+#define METRICS_VERSION "0.3.1"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -55,57 +55,63 @@ float metricssigma(float cor)
 /* Universal scale of Metrics */
 METRICSAPI float metric_um(char* metric, float value)
 {
-    if ((strcmp(metric, "mse") == 0) || (strcmp(metric, "mse-c") == 0))
+    if (strcmp(metric, "mse") == 0)
     {
         if (value > 0.0f)
         {
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= 0.148f;
-            value -= 0.53f;
+            value *= 0.158f;
+            value -= 0.63f;
         }
         else
         {
             value = 1.0f;
         }
     }
-    else if ((strcmp(metric, "psnr") == 0) || (strcmp(metric, "psnr-c") == 0))
+    else if (strcmp(metric, "psnr") == 0)
     {
         value = sqrt(value);
-        value *= 0.94f;
-        value -= 4.94f;
+        value *= 0.99f;
+        value -= 5.28f;
+    }
+    else if (strcmp(metric, "sdsnr") == 0)
+    {
+        value = sqrt(value);
+        value *= 0.85f;
+        value -= 3.84f;
     }
     else if (strcmp(metric, "ssim") == 0)
     {
         value = metricssigma(value);
         value = metricssigma(value);
         value = metricssigma(value);
-        value *= 8.57f;
-        value += 0.34f;
+        value *= 9.14f;
+        value += 0.30f;
     }
     else if (strcmp(metric, "vifp1") == 0)
     {
         value = metricssigma(value);
-        value *= 2.21f;
-        value += 0.36f;
+        value *= 2.36f;
+        value += 0.32f;
     }
     else if (strcmp(metric, "smallfry") == 0)
     {
-        value *= 0.0735f;
-        value -= 6.50f;
+        value *= 0.0777f;
+        value -= 6.93f;
     }
     else if (strcmp(metric, "shbad") == 0)
     {
-        value *= 1.46f;
-        value -= 0.04f;
+        value *= 1.53f;
+        value -= 0.09f;
     }
     else if (strcmp(metric, "cor") == 0)
     {
         value = metricssigma(value);
         value = metricssigma(value);
-        value *= 3.92f;
-        value -= 1.79f;
+        value *= 4.14f;
+        value -= 1.94f;
     }
     else if (strcmp(metric, "nhw-c") == 0)
     {
@@ -114,8 +120,8 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= 1.36f;
-            value -= 2.61f;
+            value *= 1.43f;
+            value -= 2.82f;
         }
         else
         {
@@ -129,8 +135,8 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= -0.049f;
-            value += 0.83f;
+            value *= -0.055f;
+            value += 0.82f;
         }
         else
         {
@@ -144,8 +150,8 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= 0.96f;
-            value -= 1.98f;
+            value *= 1.03f;
+            value -= 2.17f;
         }
         else
         {
@@ -176,11 +182,15 @@ METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, in
                 {
                     value = (float)delta[k];
                     value /= 255;
-                    if ((strcmp(metric, "mse") == 0) || (strcmp(metric, "mse-c") == 0))
+                    if (strcmp(metric, "mse") == 0)
                     {
                         value *= value;
                     }
-                    else if ((strcmp(metric, "psnr") == 0) || (strcmp(metric, "psnr-c") == 0))
+                    else if (strcmp(metric, "psnr") == 0)
+                    {
+                        value *= 255.0f;
+                    }
+                    else if (strcmp(metric, "sdsnr") == 0)
                     {
                         value *= 255.0f;
                     }
