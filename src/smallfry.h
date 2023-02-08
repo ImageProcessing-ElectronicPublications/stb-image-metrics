@@ -18,7 +18,7 @@
 ****************************************************************************
 *  Metrics PSNR                                                            *
 *  file: metricspsnr.h                                                     *
-*  version: 0.3.1                                                          *
+*  version: 0.4.0                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -31,7 +31,7 @@
 #ifndef __METRICS_SMALLFRY__H
 #define __METRICS_SMALLFRY__H
 
-#define METRICS_SMALLFRY_VERSION "0.3.1"
+#define METRICS_SMALLFRY_VERSION "0.4.0"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -43,7 +43,7 @@
 extern "C" {
 #endif
 METRICSAPI float metric_smallfry (unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels);
-METRICSAPI float metric_sharpenbad (unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels);
+METRICSAPI float metric_sharpenbad (unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels, int radius);
 METRICSAPI float metric_cor (unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels);
 #ifdef __cplusplus
 }
@@ -262,125 +262,79 @@ METRICSAPI float metric_smallfry (unsigned char *ref, unsigned char *cmp, unsign
     return b;
 }
 
-METRICSAPI float metric_sharpenbad (unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels)
+/* SHARPENBAD(a,b,r) = (2* GRAD(a,r) * GRAD(b,r) + C) / (GRAD(a,r) * GRAD(a,r) + GRAD(b,r) * GRAD(b,r) + C)
+ * GRAD(a,r) = a - E(a,r)
+ * GRAD(b,r) = b - E(b,r)
+ * C = 1 */
+METRICSAPI float metric_sharpenbad (unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels, int radius)
 {
-    float sharpenbad, exp1n, k332, k255p;
-    float im1, im2, imf1, imf2, ims1, ims2, imd, imd1, imd2, imdc;
-    float sumd, sumd1, sumd2, sumdc, sumdl, sumd1l, sumd2l, sumdcl;
-    int y, x, d, y0, x0, y1, x1, y2, x2;
-    size_t k, ky0, ky, kx, n, line;
+    int y, x, d, y0, x0, y1, x1, yf, xf, di, n;
+    size_t k, ky0, kx0, kf0, kf, line;
+    float sum1, sum2, ssl, ss, sql, sq, si, sharpenbad, c = 1.0f;
 
     line = width * channels;
-    exp1n = exp(-1);
-    k332 = (3.0f * 3.0f * 2.0f + 1.0f) / (3.0f * 3.0f * 2.0f - 1.0f);
-    k255p = 1.0f / 255.0f;
-
-    k = 0;
-    sumd = 0.0f;
-    sumd1 = 0.0f;
-    sumd2 = 0.0f;
-    sumdc = 0.0f;
-    for (y = 0; y < height; y++)
+    sharpenbad = 0.0f;
+    if (radius > 0)
     {
-        sumdl = 0.0f;
-        sumd1l = 0.0f;
-        sumd2l = 0.0f;
-        sumdcl = 0.0f;
-        y0 = y - 1;
-        if (y0 < 0) {y0 = 0;}
-        y2 = y + 2;
-        if (y2 > height) {y2 = height;}
-        ky0 = y0 * width;
-        for (x = 0; x < width; x++)
+        ss = 0.0f;
+        sq = 0.0f;
+        for (d = 0; d < channels; d++)
         {
-            x0 = x - 1;
-            if (x0 < 0) {x0 = 0;}
-            x2 = x + 2;
-            if (x2 > width) {x2 = width;}
-            for (d = 0; d < channels; d++)
+            k = d;
+            for (y = 0; y < height; y++)
             {
-                im1 = (float)ref[k];
-                im2 = (float)cmp[k];
+                y0 = y - radius;
+                y0 = (y0 < 0) ? 0 : y0;
+                y1 = y + radius + 1;
+                y1 = (y1 < height) ? y1 : height;
+                ky0 = y0 * line;
+                ssl = 0.0f;
+                sql = 0.0f;
+                for (x = 0; x < width; x++)
+                {
+                    x0 = x - radius;
+                    x0 = (x0 < 0) ? 0 : x0;
+                    x1 = x + radius + 1;
+                    x1 = (x1 < width) ? x1 : width;
+                    kx0 = x0 * channels;
+                    kf0 = ky0 + kx0 + d;
+                    kf = kf0;
+                    sum1 = 0.0f;
+                    sum2 = 0.0f;
+                    n = 0;
+                    for (yf = y0; yf < y1; yf++)
+                    {
+                        for (xf = x0; xf < x1; xf++)
+                        {
+                            sum1 -= (float)ref[kf];
+                            sum2 -= (float)cmp[kf];
+                            n++;
+                            kf += channels;
+                        }
+                        kf0 += line;
+                        kf = kf0;
+                    }
+                    n = (n > 0) ? n : 1;
+                    sum1 += (float)(n * (int)ref[k]);
+                    sum2 += (float)(n * (int)cmp[k]);
+                    ssl += (2.0f * sum1 * sum2 + c);
+                    sql += ((sum1 * sum1) + (sum2 * sum2) + c);
 
-                ims1 = 0.0f;
-                ims2 = 0.0f;
-                n = 0;
-                ky = ky0;
-                for (y1 = y0; y1 < y2; y1++)
-                {
-                    for (x1 = x0; x1 < x2; x1++)
+                    if (delta)
                     {
-                        kx = (ky + x1) * channels;
-                        imf1 = (float)ref[kx + d];
-                        ims1 += imf1;
-                        imf2 = (float)cmp[kx + d];
-                        ims2 += imf2;
-                        n++;
+                        si = (2.0f * sum1 * sum2 + c) / (sum1 * sum1 + sum2 * sum2 + c);
+                        si *= 255.0f;
+                        si = (si < 0.0f) ? 0.0f : (si < 255.0f) ? si : 255.0f;
+                        delta[k] = (unsigned char)si;
                     }
-                    ky += width;
+                    k += channels;
                 }
-                ims1 /= (float)n;
-                ims2 /= (float)n;
-                imd1 = im1 - ims1;
-                imd2 = im2 - ims2;
-                im1 += imd1;
-                im2 += imd2;
-                imd = im1 - im2;
-                imd1 *= k255p;
-                imd2 *= k255p;
-                imd *= k255p;
-                imd *= imd;
-                imdc = imd1 * imd2;
-                imd1 *= imd1;
-                imd2 *= imd2;
-                sumdl += imd;
-                sumd1l += imd1;
-                sumd2l += imd2;
-                sumdcl += imdc;
-                if (delta)
-                {
-                    imd2 *= imd1;
-                    if (imd2 > 0.0f)
-                    {
-                        imd /= imd2;
-                        imd *= imdc;
-                        imd *= 2.0f;
-                    }
-                    if (imd < 0.0f) {imd = -imd;}
-                    imd = sqrt(imd);
-                    imd = -imd;
-                    imd *= exp1n;
-                    imd += k332;
-                    imd *= 127.5f;
-                    imd += 127.5f;
-                    delta[k] = (unsigned char)((imd < 0.0f) ? 0 : (imd < 255.0f) ? imd : 255);
-                }
-                k++;
+                ss += ssl;
+                sq += sql;
             }
         }
-        sumd += sumdl;
-        sumd1 += sumd1l;
-        sumd2 += sumd2l;
-        sumdc += sumdcl;
     }
-    sumd2 *= sumd1;
-    if (sumd2 > 0.0f)
-    {
-        sumd /= sumd2;
-        sumd *= sumdc;
-        sumd *= 2.0f;
-    } else {
-        sumd /= (float)height;
-        sumd /= (float)width;
-        sumd /= (float)channels;
-    }
-    if (sumd < 0.0f) {sumd = -sumd;}
-    sumd = sqrt(sumd);
-    sumd = -sumd;
-    sumd *= exp1n;
-    sumd += k332;
-
-    sharpenbad = sumd;
+    sharpenbad = ss / sq;
 
     return sharpenbad;
 }

@@ -1,4 +1,4 @@
-.TH "StbImMetrics" 1 0.3.1 "15 Jan 2023" "User Manual"
+.TH "StbImMetrics" 1 0.4.0 "07 Feb 2023" "User Manual"
 
 .SH NAME
 stbimmetrics
@@ -25,7 +25,7 @@ The value of PSNR metrics is from 0.0 (maximum difference) to inf.
 
 The value of SSIM and VIPF1 metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
-The value of SHARPENBAD metrics is from 1.0 (minimum difference) to -1.0 (maximum difference).
+The value of SHARPENBAD metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
 The value of Correlation metrics is from 1.0 (minimum difference) to 0.0 (maximum difference).
 
@@ -52,6 +52,9 @@ metric (default psnr):
     nhw-n    - NHW neatness
     nhw-c    - NHW convolutional
     nhw-r    - NHW relative
+.TP
+-r NUM
+radius for SHARPENBAD (default 1)
 .TP
 -q
 quiet mode
@@ -94,17 +97,17 @@ stbnhwmetrics -m nhw-r lena.png lena.quant444.png lena.quant444.nhw-r.png
 .PP
 Trends:
 
-  UM = 0.158 * sqrt(sqrt(1.0 / MSE)) - 0.63
-  UM = 0.99 * sqrt(PNSR) - 5.28
-  UM = 0.85 * sqrt(SDNSR) - 3.84
-  UM = 9.14 * cor_sigma(cor_sigma(cor_sigma(SSIM))) + 0.30
-  UM = 2.36 * cor_sigma(VIFP1) + 0.32
-  UM = 0.0777 * SMALLFRY - 6.93
-  UM = 1.53 * SHARPENBAD - 0.09
-  UM = 4.14 * cor_sigma(cor_sigma(COR)) - 1.94
-  UM = -0.055 * sqrt(sqrt(1.0 / NHW-N)) + 0.82
-  UM = 1.43 * sqrt(sqrt(1.0 / NHW-C)) - 2.82
-  UM = 1.03 * sqrt(sqrt(1.0 / NHW-R)) - 2.17
+  UM = 0.0713 * sqrt(sqrt(1.0 / MSE))
+  UM = 0.109 * sqrt(PNSR)
+  UM = 0.122 * sqrt(SDNSR)
+  UM = 1.0 * cor_sigma(cor_sigma(COR))
+  UM = 2.18 * cor_sigma(cor_sigma(SSIM))
+  UM = 3.61 * cor_sigma(VIFP1)
+  UM = 3.0 * (SMALLFRY / 100 - 0.5) * (SMALLFRY / 100 - 0.5)
+  UM = (1.0 + 0.75 / radius) * cor_sigma(SHARPENBAD)
+  UM = 0.261 * sqrt(sqrt(1.0 / NHW-C))
+  UM = 0.286 * sqrt(sqrt(1.0 / NHW-N))
+  UM = 0.223 * sqrt(sqrt(1.0 / NHW-R))
     cor_sigma(M) = 1.0 - sqrt(1.0 - M * M)
 
 .SH COPYRIGHT

@@ -2,7 +2,7 @@
 ****************************************************************************
 *  Metrics PSNR                                                            *
 *  file: metricspsnr.h                                                     *
-*  version: 0.3.1                                                          *
+*  version: 0.4.0                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -14,7 +14,7 @@
 #ifndef __METRICS_PSNR__H
 #define __METRICS_PSNR__H
 
-#define METRICS_PSNR_VERSION "0.3.1"
+#define METRICS_PSNR_VERSION "0.4.0"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -143,9 +143,15 @@ METRICSAPI float metrics_mse(unsigned char *ref, unsigned char *cmp, unsigned ch
                 im2 = (float)cmp[k];
                 im2 -= sum2;
                 im2 *= sumq1;
-                error = (im1 > im2) ? (im1 - im2) : (im2 - im1);
+                error = im2 - im1;
                 suml += error * error;
-                if (delta) delta[k] = (unsigned char)error;
+                if (delta)
+                {
+                    error *= 0.5f;
+                    error += 128.0f;
+                    error = (error < 0.0f) ? 0.0f : (error < 255.0f) ? error : 255.0f;
+                    delta[k] = (unsigned char)error;
+                }
                 k++;
             }
         }
@@ -179,11 +185,15 @@ METRICSAPI float metrics_psnr(unsigned char *ref, unsigned char *cmp, unsigned c
                 {
                     t = (float)delta[k];
                     t /= 255.0f;
+                    t -= 0.5f;
+                    t *= 2.0f;
                     t *= t;
                     t += mse;
                     t *= 0.5f;
                     t = (t > 0.0f) ? (10.0f * log10( 1.0f / t)) : 255.0f;
-                    delta[k] = (unsigned char)((t < 0.0f) ? 0.0f : (t < 255.0f) ? t : 255);
+                    t *= 3.0f;
+                    t = (t < 0.0f) ? 0.0f : (t < 255.0f) ? t : 255.0f;
+                    delta[k] = (unsigned char)t;
                     k++;
                 }
             }
@@ -193,10 +203,7 @@ METRICSAPI float metrics_psnr(unsigned char *ref, unsigned char *cmp, unsigned c
     return psnr;
 }
 
-/* SDSNR(a,b) = 10*log10((S2(a)+ S2(b)) / MSE(a,b) / 2)
- * S2(a) = 1/N * (SUM((a/MAX)^2) - SUM(1/N * (a/MAX))^2)
- * S2(b) = 1/N * (SUM((b/MAX)^2) - SUM(1/N * (b/MAX))^2)
- * MSE(a,b) = 1/N * SUM(((a-b)/MAX)^2), MAX = 255 */
+/* StDev2(a) = 1/N * (SUM((a/MAX)^2) - SUM(1/N * (a/MAX))^2) */
 float stdev2(unsigned char *ref, int height, int width, int channels)
 {
     float sum2l, sum2, suml, sum, val;
@@ -231,6 +238,10 @@ float stdev2(unsigned char *ref, int height, int width, int channels)
     return sum2;
 }
 
+/* SDSNR(a,b) = 10*log10((S2(a) + S2(b)) / MSE(a,b) / 2)
+ * S2(a) = StDev2(a)
+ * S2(b) = StDev2(b)
+ * MSE(a,b) = 1/N * SUM(((a-b)/MAX)^2), MAX = 255 */
 METRICSAPI float metrics_sdsnr(unsigned char *ref, unsigned char *cmp, unsigned char* delta, int height, int width, int channels, int corel)
 {
     int y, x, d;
@@ -256,10 +267,13 @@ METRICSAPI float metrics_sdsnr(unsigned char *ref, unsigned char *cmp, unsigned 
                 for (d = 0; d < channels; d++)
                 {
                     t = (float)delta[k];
+                    t -= 127.5f;
+                    t *= 2.0f;
                     t *= t;
                     t += mse;
                     t *= 0.5f;
                     t = (t > 0.0f) ? (10.0f * log10(s2 / t)) : 255.0f;
+                    t *= 3.0f;
                     delta[k] = (unsigned char)((t < 0.0f) ? 0.0f : (t < 255.0f) ? t : 255);
                     k++;
                 }

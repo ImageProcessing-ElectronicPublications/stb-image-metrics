@@ -6,7 +6,7 @@ https://github.com/rolinh/VQMT
 ****************************************************************************
 *  Metrics SSIM                                                            *
 *  file: ssim.h                                                            *
-*  version: 0.3.1                                                          *
+*  version: 0.4.0                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -19,7 +19,7 @@ https://github.com/rolinh/VQMT
 #ifndef SSIM_H_
 #define SSIM_H_
 
-#define METRICS_SSIM_VERSION "0.3.1"
+#define METRICS_SSIM_VERSION "0.4.0"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static

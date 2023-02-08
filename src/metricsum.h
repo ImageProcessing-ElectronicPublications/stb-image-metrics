@@ -2,7 +2,7 @@
 ****************************************************************************
 *  Metrics UM                                                              *
 *  file: metricsum.h                                                       *
-*  version: 0.3.1                                                          *
+*  version: 0.4.0                                                          *
 *                                                                          *
 ****************************************************************************
 ***************************************************************************/
@@ -15,7 +15,7 @@
 #ifndef __METRICS_UM__H
 #define __METRICS_UM__H
 
-#define METRICS_VERSION "0.3.1"
+#define METRICS_VERSION "0.4.0"
 
 #ifdef METRICS_STATIC
 #define METRICSAPI static
@@ -26,8 +26,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-METRICSAPI float metric_um(char* metric, float value);
-METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, int channels, char* metric, float umval);
+METRICSAPI float metric_um(char* metric, float value, float radius);
+METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, int channels, char* metric, float radius);
 #ifdef __cplusplus
 }
 #endif
@@ -53,8 +53,11 @@ float metricssigma(float cor)
 }
 
 /* Universal scale of Metrics */
-METRICSAPI float metric_um(char* metric, float value)
+METRICSAPI float metric_um(char* metric, float value, float radius)
 {
+    float k1;
+
+    k1 = 1.0f;
     if (strcmp(metric, "mse") == 0)
     {
         if (value > 0.0f)
@@ -62,8 +65,7 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= 0.158f;
-            value -= 0.63f;
+            k1 = 0.0713f;
         }
         else
         {
@@ -73,45 +75,40 @@ METRICSAPI float metric_um(char* metric, float value)
     else if (strcmp(metric, "psnr") == 0)
     {
         value = sqrt(value);
-        value *= 0.99f;
-        value -= 5.28f;
+        k1 = 0.109f;
     }
     else if (strcmp(metric, "sdsnr") == 0)
     {
         value = sqrt(value);
-        value *= 0.85f;
-        value -= 3.84f;
-    }
-    else if (strcmp(metric, "ssim") == 0)
-    {
-        value = metricssigma(value);
-        value = metricssigma(value);
-        value = metricssigma(value);
-        value *= 9.14f;
-        value += 0.30f;
-    }
-    else if (strcmp(metric, "vifp1") == 0)
-    {
-        value = metricssigma(value);
-        value *= 2.36f;
-        value += 0.32f;
-    }
-    else if (strcmp(metric, "smallfry") == 0)
-    {
-        value *= 0.0777f;
-        value -= 6.93f;
-    }
-    else if (strcmp(metric, "shbad") == 0)
-    {
-        value *= 1.53f;
-        value -= 0.09f;
+        k1 = 0.122f;
     }
     else if (strcmp(metric, "cor") == 0)
     {
         value = metricssigma(value);
         value = metricssigma(value);
-        value *= 4.14f;
-        value -= 1.94f;
+        k1 = 1.0f;
+    }
+    else if (strcmp(metric, "ssim") == 0)
+    {
+        value = metricssigma(value);
+        value = metricssigma(value);
+        k1 = 2.18f;
+    }
+    else if (strcmp(metric, "vifp1") == 0)
+    {
+        value = metricssigma(value);
+        k1 = 3.61f;
+    }
+    else if (strcmp(metric, "smallfry") == 0)
+    {
+        value = (value - 50.0f) * 0.01f;
+        value *= value;
+        k1 = 3.0f;
+    }
+    else if (strcmp(metric, "shbad") == 0)
+    {
+        value = metricssigma(value);
+        k1 = 1.0f + 0.75f / radius;
     }
     else if (strcmp(metric, "nhw-c") == 0)
     {
@@ -120,8 +117,7 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= 1.43f;
-            value -= 2.82f;
+            k1 = 0.261f;
         }
         else
         {
@@ -135,8 +131,7 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= -0.055f;
-            value += 0.82f;
+            k1 = 0.286f;
         }
         else
         {
@@ -150,19 +145,19 @@ METRICSAPI float metric_um(char* metric, float value)
             value = 1.0f / value;
             value = sqrt(value);
             value = sqrt(value);
-            value *= 1.03f;
-            value -= 2.17f;
+            k1 = 0.223f;
         }
         else
         {
             value = 1.0f;
         }
     }
+    value *= k1;
 
     return value;
 }
 
-METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, int channels, char* metric, float umval)
+METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, int channels, char* metric, float radius)
 {
     float value, suml, sum = 0.0f;
     size_t k;
@@ -181,23 +176,16 @@ METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, in
                 for (d = 0; d < channels; d++)
                 {
                     value = (float)delta[k];
-                    value /= 255;
+                    value /= 255.0f;
                     if (strcmp(metric, "mse") == 0)
-                    {
-                        value *= value;
-                    }
-                    else if (strcmp(metric, "psnr") == 0)
-                    {
-                        value *= 255.0f;
-                    }
-                    else if (strcmp(metric, "sdsnr") == 0)
-                    {
-                        value *= 255.0f;
-                    }
-                    else if (strcmp(metric, "shbad") == 0)
                     {
                         value -= 0.5f;
                         value *= 2.0f;
+                        value *= value;
+                    }
+                    else if ((strcmp(metric, "psnr") == 0) || (strcmp(metric, "sdsnr") == 0))
+                    {
+                        value *= 85.0f;
                     }
                     else if (strcmp(metric, "smallfry") == 0)
                     {
@@ -207,9 +195,8 @@ METRICSAPI float metric_um_image(unsigned char* delta, int height, int width, in
                     {
                         value -= 0.5f;
                     }
-                    value = metric_um(metric, value);
-                    value -= umval;
-                    value *= 127.5;
+                    value = metric_um(metric, value, radius);
+                    value *= 255.0f;
                     value += 0.5f;
                     cval = (int)((value < 0.0f) ? 0 : (value < 255.0f) ? value : 255);
                     value -= 0.5f;

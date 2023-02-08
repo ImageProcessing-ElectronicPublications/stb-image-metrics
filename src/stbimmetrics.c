@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "stb/stb_image.h"
-#include "stb/stb_image_write.h"
+#include <stb/stb_image.h>
+#include <stb/stb_image_write.h>
 #include "metricsum.h"
 #include "ycbcr.h"
 #include "metricspsnr.h"
@@ -14,24 +14,25 @@
 #include "smallfry.h"
 #include "metricsnhw.h"
 
-void immetrics_usage(char* prog, char* metric)
+void immetrics_usage(char* prog, char* metric, int radius)
 {
     printf("StbImMetrics version %s.\n", METRICS_VERSION);
     printf("usage: %s [options] image_in_orig image_in_comp [metric_out.png]\n", prog);
     printf("options:\n");
-    printf("\t-m STR\tmetric (default %s):\n", metric);
     printf("\t-c\tcorrelation mode: for MSE, PSNR, SDSNR\n");
+    printf("\t-m STR\tmetric (default %s):\n", metric);
     printf("\t\tmse      -\t MSE / MAX^2, MAX = 255\n");
     printf("\t\tpsnr     -\t PSNR\n");
     printf("\t\tsdsnr    -\t SDSNR\n");
+    printf("\t\tcor      -\t correlation\n");
     printf("\t\tssim     -\t SSIM\n");
+    printf("\t\tvifp1    -\t VIFP 1 layer\n");
     printf("\t\tsmallfry -\t SMALLFRY\n");
     printf("\t\tshbad    -\t SHARPENBAD\n");
-    printf("\t\tcor      -\t correlation\n");
-    printf("\t\tvifp1    -\t VIFP 1 layer\n");
     printf("\t\tnhw-n    -\t NHW neatness\n");
     printf("\t\tnhw-c    -\t NHW convolutional\n");
     printf("\t\tnhw-r    -\t NHW relative\n");
+    printf("\t-r NUM\tradius for SHARPENBAD (default %d)\n", radius);
     printf("\t-q\tquiet mode\n");
     printf("\t-u\tUM mode (Universal scale of Metrics)\n");
     printf("\t-y\tYCbCr mode\n");
@@ -44,6 +45,7 @@ int main(int argc, char **argv)
     int height_c = 0, width_c = 0, channels_c = 0;
     char *metric = "psnr";
     int corel = 0;
+    int radius = 1;
     int fhelp = 0;
     int fquiet = 0;
     int fum = 0;
@@ -55,7 +57,7 @@ int main(int argc, char **argv)
     size_t ki = 0, kd = 0;
     float neatness = 0.0f;
 
-    while ((opt = getopt(argc, argv, ":cm:quyh")) != -1)
+    while ((opt = getopt(argc, argv, ":cm:r:quyh")) != -1)
     {
         switch(opt)
         {
@@ -64,6 +66,9 @@ int main(int argc, char **argv)
             break;
         case 'm':
             metric = optarg;
+            break;
+        case 'r':
+            radius = atoi(optarg);
             break;
         case 'q':
             fquiet = 1;
@@ -89,7 +94,7 @@ int main(int argc, char **argv)
     }
     if(optind + 2 > argc || fhelp)
     {
-        immetrics_usage(argv[0], metric);
+        immetrics_usage(argv[0], metric, radius);
         return 0;
     }
     name_orig = argv[optind];
@@ -201,25 +206,25 @@ int main(int argc, char **argv)
         {
             neatness = metrics_sdsnr(data_orig, data_comp, data_m, height, width, channels, corel);
         }
-        else if (strcmp(metric, "smallfry") == 0)
+        else if (strcmp(metric, "cor") == 0)
         {
-            neatness = metric_smallfry(data_orig, data_comp, data_m, height, width, channels);
+            neatness = metric_cor(data_orig, data_comp, data_m, height, width, channels);
         }
         else if (strcmp(metric, "ssim") == 0)
         {
             neatness = metric_ssim(data_orig, data_comp, data_m, height, width, channels);
         }
-        else if (strcmp(metric, "shbad") == 0)
-        {
-            neatness = metric_sharpenbad(data_orig, data_comp, data_m, height, width, channels);
-        }
-        else if (strcmp(metric, "cor") == 0)
-        {
-            neatness = metric_cor(data_orig, data_comp, data_m, height, width, channels);
-        }
         else if (strcmp(metric, "vifp1") == 0)
         {
             neatness = metric_vifp1(data_orig, data_comp, data_m, height, width, channels);
+        }
+        else if (strcmp(metric, "smallfry") == 0)
+        {
+            neatness = metric_smallfry(data_orig, data_comp, data_m, height, width, channels);
+        }
+        else if (strcmp(metric, "shbad") == 0)
+        {
+            neatness = metric_sharpenbad(data_orig, data_comp, data_m, height, width, channels, radius);
         }
         else if (strcmp(metric, "nhw-c") == 0)
         {
@@ -241,10 +246,10 @@ int main(int argc, char **argv)
     }
     if (fum)
     {
-        neatness = metric_um(metric, neatness);
+        neatness = metric_um(metric, neatness, radius);
         if (name_m)
         {
-            (void)metric_um_image(data_m, height, width, channels, metric, neatness);
+            (void)metric_um_image(data_m, height, width, channels, metric, radius);
         }
     }
     if (!fquiet)
